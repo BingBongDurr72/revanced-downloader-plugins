@@ -28,4 +28,13 @@ jobs:
       - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew build --no-daemon
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: downloader-plugins
+          path: |
+            apkmirror-downloader/build/outputs/apk/release/*.apk
+            apkpure-downloader/build/outputs/apk/release/*.apk
+            apkcombo-downloader/build/outputs/apk/release/*.apk

@@ -1,0 +1,53 @@
+name: Build APKs
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - dev
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Cache Gradle
+        uses: burrunan/gradle-cache-action@v2
+
+      - name: Build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Upload APKMirror Downloader
+        uses: actions/upload-artifact@v4
+        with:
+          name: apkmirror-downloader
+          path: apkmirror-downloader/build/outputs/apk/release/*.apk
+
+      - name: Upload APKPure Downloader
+        uses: actions/upload-artifact@v4
+        with:
+          name: apkpure-downloader
+          path: apkpure-downloader/build/outputs/apk/release/*.apk
+
+      - name: Upload APKCombo Downloader
+        uses: actions/upload-artifact@v4
+        with:
+          name: apkcombo-downloader
+          path: apkcombo-downloader/build/outputs/apk/release/*.apk
